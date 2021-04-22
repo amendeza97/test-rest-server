@@ -17,7 +17,7 @@ const getUsers = async (req, res = response) => {
 
 const putUsers = async (req, res = response) => {
   const { userId } = req.params;
-  const { _id, password, google, email, ...user } = req.body;
+  const { password, google, email, ...user } = req.body;
 
   if (password) {
     const salt = bcrypt.genSaltSync();
@@ -44,9 +44,16 @@ const postUsers = async (req, res = response) => {
 const deleteUsers = async (req, res = response) => {
   const { userId } = req.params;
 
-  const deletedUser = await User.findByIdAndUpdate(userId, { active: false });
+  let user = await User.findById(userId);
+  if (!user.active) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+  user.active = false;
+  await user.save();
 
-  res.status(200).json(deletedUser);
+  res.status(200).json({ deletedUser: user, authenticated: req.user });
 };
 
 const patchUsers = (req, res = response) => {

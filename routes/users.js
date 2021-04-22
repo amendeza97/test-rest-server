@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 
+const { JWTValidator, RoleValidator } = require('../middlewares')
+
 const { validateFields } = require("../middlewares/fields-validator");
 const {
   isValidRole,
@@ -37,6 +39,7 @@ router.post(
 router.put(
   "/:userId",
   [
+    JWTValidator.validate,
     check("userId", "Invalid id").isMongoId(),
     check("userId").custom(isUserExistingById),
     check("role").custom(isValidRole),
@@ -49,9 +52,11 @@ router.get("/", getUsers);
 router.delete(
   "/:userId",
   [
+    JWTValidator.validate,
+    RoleValidator.validateRole('ADMIN_ROLE' ),
     check("userId", "Invalid id").isMongoId(),
     check("userId").custom(isUserExistingById),
-    validateFields
+    validateFields,
   ],
   deleteUsers
 );

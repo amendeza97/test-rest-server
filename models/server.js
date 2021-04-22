@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const { dbConnection } = require('../db/config')
 const userRoutes = require("../routes/users");
+const authRoutes = require("../routes/auth");
 
 class Server {
   constructor() {
@@ -31,7 +32,8 @@ class Server {
   }
 
   routes() {
-    this.app.use("/api/users/", userRoutes);
+    this.app.use("/api/auth", authRoutes);
+    this.app.use("/api/users", userRoutes);
   }
 
   listen() {
